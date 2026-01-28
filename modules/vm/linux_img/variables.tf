@@ -51,13 +51,9 @@ variable "network_vlan_id" {
 }
 
 variable "on_boot" {
-  type        = string
-  description = "Action to take on boot"
-  default     = "restart"
-  validation {
-    condition     = contains(["restart", "ignore", "shutdown"], var.on_boot)
-    error_message = "on_boot must be one of \"restart\", \"ignore\", or \"shutdown\""
-  }
+  type        = bool
+  description = "Whether the VM should start on proxmox boot"
+  default     = true
 }
 
 variable "started" {

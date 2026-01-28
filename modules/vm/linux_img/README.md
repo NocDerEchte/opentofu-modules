@@ -1,14 +1,15 @@
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox) | 0.92.0 |
+| Name                                                                      | Version |
+| ------------------------------------------------------------------------- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | v1.10.5 |
+| <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox)       | 0.93.0  |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_proxmox"></a> [proxmox](#provider\_proxmox) | 0.92.0 |
+| Name                                                          | Version |
+| ------------------------------------------------------------- | ------- |
+| <a name="provider_proxmox"></a> [proxmox](#provider\_proxmox) | 0.93.0  |
 
 ## Modules
 
@@ -16,20 +17,46 @@ No modules.
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [proxmox_virtual_environment_vm.vm](https://registry.terraform.io/providers/bpg/proxmox/0.92.0/docs/resources/virtual_environment_vm) | resource |
+| Name                                                                                                                                                                 | Type     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| [proxmox_virtual_environment_download_file.cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.93.0/docs/resources/virtual_environment_download_file) | resource |
+| [proxmox_virtual_environment_vm.linux_img](https://registry.terraform.io/providers/bpg/proxmox/0.93.0/docs/resources/virtual_environment_vm)                         | resource |
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_description"></a> [description](#input\_description) | Description of the VM | `string` | `"Managed by OpenTofu"` | no |
-| <a name="input_name"></a> [name](#input\_name) | n/a | `string` | n/a | yes |
-| <a name="input_node_name"></a> [node\_name](#input\_node\_name) | Proxmox node where the VM will be created | `string` | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign to the VM | `list(string)` | `[]` | no |
-| <a name="input_vm_id"></a> [vm\_id](#input\_vm\_id) | ID of the VM | `number` | `null` | no |
+| Name                                                                                 | Description                                                                                           | Type                                                                                                                                                                                                               | Default                 | Required |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- | :------: |
+| <a name="input_bios"></a> [bios](#input\_bios)                                       | BIOS type for the VM                                                                                  | `string`                                                                                                                                                                                                           | `"ovmf"`                |    no    |
+| <a name="input_boot_disk"></a> [boot\_disk](#input\_boot\_disk)                      | Boot disk configuration for the VM. Image will be imported to this disk based on the cloud image URL. | <pre>object({<br/>    ssd          = bool<br/>    datastore_id = string<br/>    size         = number<br/>    interface    = string<br/>    iothread     = bool<br/>    discard      = string<br/>  })</pre>       | n/a                     |   yes    |
+| <a name="input_cloud_image_url"></a> [cloud\_image\_url](#input\_cloud\_image\_url)  | URL of the cloud image to download for the VM                                                         | `string`                                                                                                                                                                                                           | n/a                     |   yes    |
+| <a name="input_cpu_cores"></a> [cpu\_cores](#input\_cpu\_cores)                      | Number of CPU cores for the VM                                                                        | `number`                                                                                                                                                                                                           | `1`                     |    no    |
+| <a name="input_cpu_sockets"></a> [cpu\_sockets](#input\_cpu\_sockets)                | Number of CPU sockets for the VM                                                                      | `number`                                                                                                                                                                                                           | `1`                     |    no    |
+| <a name="input_cpu_type"></a> [cpu\_type](#input\_cpu\_type)                         | CPU type for the VM                                                                                   | `string`                                                                                                                                                                                                           | `"host"`                |    no    |
+| <a name="input_datastore_id"></a> [datastore\_id](#input\_datastore\_id)             | Datastore ID where the VM disks will be created                                                       | `string`                                                                                                                                                                                                           | `"local-lvm"`           |    no    |
+| <a name="input_description"></a> [description](#input\_description)                  | Description of the VM                                                                                 | `string`                                                                                                                                                                                                           | `"Managed by OpenTofu"` |    no    |
+| <a name="input_disks"></a> [disks](#input\_disks)                                    | List of disks to attach to the VM                                                                     | <pre>list(object({<br/>    ssd          = bool<br/>    datastore_id = string<br/>    size         = number<br/>    interface    = string<br/>    iothread     = bool<br/>    discard      = string<br/>  }))</pre> | `[]`                    |    no    |
+| <a name="input_ip_config_type"></a> [ip\_config\_type](#input\_ip\_config\_type)     | Type of IP configuration for the VM initialization (dhcp or static)                                   | `string`                                                                                                                                                                                                           | `"dhcp"`                |    no    |
+| <a name="input_ipv4_address"></a> [ipv4\_address](#input\_ipv4\_address)             | Static IPv4 address to assign to the VM (required if ip\_config\_type is static)                      | `string`                                                                                                                                                                                                           | `null`                  |    no    |
+| <a name="input_ipv4_gateway"></a> [ipv4\_gateway](#input\_ipv4\_gateway)             | Static IPv4 gateway to assign to the VM (required if ip\_config\_type is static)                      | `string`                                                                                                                                                                                                           | `null`                  |    no    |
+| <a name="input_machine"></a> [machine](#input\_machine)                              | Machine type for the VM                                                                               | `string`                                                                                                                                                                                                           | `"q35"`                 |    no    |
+| <a name="input_memory_dedicated"></a> [memory\_dedicated](#input\_memory\_dedicated) | Dedicated memory for the VM                                                                           | `number`                                                                                                                                                                                                           | `1024`                  |    no    |
+| <a name="input_memory_floating"></a> [memory\_floating](#input\_memory\_floating)    | Floating memory for the VM (ballooning)                                                               | `number`                                                                                                                                                                                                           | `1024`                  |    no    |
+| <a name="input_migrate"></a> [migrate](#input\_migrate)                              | Whether the VM should be migrated if it already exists on another node                                | `bool`                                                                                                                                                                                                             | `true`                  |    no    |
+| <a name="input_name"></a> [name](#input\_name)                                       | n/a                                                                                                   | `string`                                                                                                                                                                                                           | n/a                     |   yes    |
+| <a name="input_network_bridge"></a> [network\_bridge](#input\_network\_bridge)       | Network bridge to attach the VM's network device to                                                   | `string`                                                                                                                                                                                                           | `"vmbr0"`               |    no    |
+| <a name="input_network_model"></a> [network\_model](#input\_network\_model)          | Network model for the VM's network device                                                             | `string`                                                                                                                                                                                                           | `"virtio"`              |    no    |
+| <a name="input_network_vlan_id"></a> [network\_vlan\_id](#input\_network\_vlan\_id)  | VLAN ID for the VM's network device                                                                   | `number`                                                                                                                                                                                                           | `null`                  |    no    |
+| <a name="input_node_name"></a> [node\_name](#input\_node\_name)                      | Proxmox node where the VM will be created                                                             | `string`                                                                                                                                                                                                           | n/a                     |   yes    |
+| <a name="input_on_boot"></a> [on\_boot](#input\_on\_boot)                            | Action to take on boot                                                                                | `string`                                                                                                                                                                                                           | `"restart"`             |    no    |
+| <a name="input_pool_id"></a> [pool\_id](#input\_pool\_id)                            | Pool ID to assign the VM to                                                                           | `string`                                                                                                                                                                                                           | `null`                  |    no    |
+| <a name="input_started"></a> [started](#input\_started)                              | Whether the VM should be started after creation                                                       | `bool`                                                                                                                                                                                                             | `true`                  |    no    |
+| <a name="input_tags"></a> [tags](#input\_tags)                                       | Tags to assign to the VM                                                                              | `list(string)`                                                                                                                                                                                                     | `[]`                    |    no    |
+| <a name="input_vm_id"></a> [vm\_id](#input\_vm\_id)                                  | ID of the VM                                                                                          | `number`                                                                                                                                                                                                           | `null`                  |    no    |
 
 ## Outputs
 
-No outputs.
+| Name                                                                             | Description                       |
+| -------------------------------------------------------------------------------- | --------------------------------- |
+| <a name="output_ipv4_addresses"></a> [ipv4\_addresses](#output\_ipv4\_addresses) | IPv4 addresses assigned to the VM |
+| <a name="output_ipv6_addresses"></a> [ipv6\_addresses](#output\_ipv6\_addresses) | IPv6 addresses assigned to the VM |
+| <a name="output_vm_name"></a> [vm\_name](#output\_vm\_name)                      | Name of the created VM            |

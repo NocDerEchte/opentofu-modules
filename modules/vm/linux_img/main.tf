@@ -9,7 +9,7 @@ terraform {
 }
 
 resource "proxmox_virtual_environment_download_file" "cloud_image" {
-  content_type = "iso"
+  content_type = "import"
   datastore_id = "local"
   node_name    = var.node_name
   url          = var.cloud_image_url
@@ -42,24 +42,24 @@ resource "proxmox_virtual_environment_vm" "linux_img" {
   }
 
   disk {
-    ssd          = var.boot_disk.ssd
     datastore_id = var.boot_disk.datastore_id
+    interface    = "scsi0"
     size         = var.boot_disk.size
-    interface    = var.boot_disk.interface
+    ssd          = var.boot_disk.ssd
     iothread     = var.boot_disk.iothread
     discard      = var.boot_disk.discard
     import_from  = proxmox_virtual_environment_download_file.cloud_image.id
   }
 
   dynamic "disk" {
-    for_each = var.disks
+    for_each = { for idx, val in var.disks : idx => val }
+    iterator = data_disk
     content {
-      ssd          = disk.value.ssd
-      datastore_id = disk.value.datastore_id
-      size         = disk.value.size
-      interface    = disk.value.interface
-      iothread     = disk.value.iothread
-      discard      = disk.value.discard
+      datastore_id      = data_disk.value["datastore_id"]
+      interface         = "scsi${data_disk.key + 1}"
+      size              = data_disk.value["size"]
+      file_format       = data_disk.value["file_format"]
+      path_in_datastore = data_disk.value["path_in_datastore"]
     }
   }
 

@@ -42,6 +42,19 @@ variable "network_model" {
   type        = string
   description = "Network model for the VM's network device"
   default     = "virtio"
+  validation {
+    condition = contains(
+      [
+        "e1000",
+        "e1000e",
+        "rtl8139",
+        "virtio",
+        "vmxnet3",
+      ],
+      var.network_model,
+    )
+    error_message = "network_model must be a valid model supported by Proxmox (e.g., \"virtio\", \"e1000\", etc.)"
+  }
 }
 
 variable "network_vlan_id" {
@@ -113,8 +126,8 @@ variable "machine" {
   description = "Machine type for the VM"
   default     = "q35"
   validation {
-    condition     = contains(["i440fx", "q35"], var.machine)
-    error_message = "machine must be a valid machine type supported by Proxmox (e.g., \"i440fx\", \"q35\")"
+    condition     = contains(["pc", "q35"], var.machine)
+    error_message = "machine must be a valid machine type supported by Proxmox (e.g., \"pc\", \"q35\")"
   }
 }
 
@@ -126,10 +139,9 @@ variable "tags" {
 
 variable "boot_disk" {
   type = object({
-    ssd          = bool
     datastore_id = string
     size         = number
-    interface    = string
+    ssd          = bool
     iothread     = bool
     discard      = string
   })
@@ -138,10 +150,9 @@ variable "boot_disk" {
 
 variable "disks" {
   type = list(object({
-    ssd          = bool
     datastore_id = string
     size         = number
-    interface    = string
+    ssd          = bool
     iothread     = bool
     discard      = string
   }))
